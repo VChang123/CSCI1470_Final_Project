@@ -5,8 +5,9 @@ import argparse
 import numpy as np
 from PIL import Image
 import csv
+import imageio
 
-def load_data():
+def load_data(resize):
     # Find all the Image Files
     image_files = open("./data/groundtruth_train.tsv")
     read_tsv = csv.reader(image_files, delimiter="\t")
@@ -21,14 +22,16 @@ def load_data():
 
         # Open the Image
         img = Image.open(image_path)
-
+        # print(img)
+        
         # Rescale the Image to the Appropriate Size
-        # img = img.resize(resize)
+        img = img.resize(resize)
 
         # Convert from ints to floats
-        img = np.array(img, dtype=np.float32)
+        img = np.array(img)
 
         images.append(img)
+        break
 
     images = np.asarray(images)
 
@@ -36,14 +39,15 @@ def load_data():
     images = images.astype('float32')
 
     # Scale from [0,255] to [-1,1]
-    # images = images/255
+    images = images/255
 
     return images
 
     
 if __name__ == '__main__':
-   output = load_data()
+   output = load_data(resize=(32,32))
    for i in output:
-       print(i)
+       for j in i:
+           print(j)
    
   
