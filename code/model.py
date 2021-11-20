@@ -1,13 +1,6 @@
 import csv
 
-def load_categories():
-    
-    with open('data/categories.txt', 'r') as desc:
-        lines = desc.readlines()
 
-        categories = [{ "name": line.split(":")[0], "classes": line.split(":")[1].strip().split(" ")} for line in lines]
-        
-        return categories
 
 def main():
     tsv_file = open('data/groundtruth_train.tsv')
