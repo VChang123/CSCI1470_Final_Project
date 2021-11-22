@@ -7,51 +7,52 @@ from io import StringIO
 
 def get_traces_data(inkml_file_abs_path, xmlns='{http://www.w3.org/2003/InkML}'):
 
-    traces_data = []
+    	traces_data = []
 
-    tree = ET.parse(inkml_file_abs_path)
-    root = tree.getroot()
-    # doc_namespace = "{http://www.w3.org/2003/InkML}"
-    doc_namespace = xmlns
+    	tree = ET.parse(inkml_file_abs_path)
+    	root = tree.getroot()
+    	# doc_namespace = "{http://www.w3.org/2003/InkML}"
+    	doc_namespace = xmlns
 
-    'Stores traces_all with their corresponding id'
-    traces_all = [{'id': trace_tag.get('id'), 'coords': [[round(float(axis_coord)) if float(axis_coord).is_integer() else round(float(axis_coord) * 10000) \
+    	'Stores traces_all with their corresponding id'
+    	traces_all = [{'id': trace_tag.get('id'),
+    					'coords': [[round(float(axis_coord)) if float(axis_coord).is_integer() else round(float(axis_coord) * 10000) \
     									for axis_coord in coord[1:].split(' ')] if coord.startswith(' ') \
     								else [round(float(axis_coord)) if float(axis_coord).is_integer() else round(float(axis_coord) * 10000) \
     									for axis_coord in coord.split(' ')] \
     							for coord in (trace_tag.text).replace('\n', '').split(',')]} \
     							for trace_tag in root.findall(doc_namespace + 'trace')]
 
-    'Sort traces_all list by id to make searching for references faster'
-    traces_all.sort(key=lambda trace_dict: int(trace_dict['id']))
+    	'Sort traces_all list by id to make searching for references faster'
+    	traces_all.sort(key=lambda trace_dict: int(trace_dict['id']))
 
-    'Always 1st traceGroup is a redundant wrapper'
-    traceGroupWrapper = root.find(doc_namespace + 'traceGroup')
+    	'Always 1st traceGroup is a redundant wrapper'
+    	traceGroupWrapper = root.find(doc_namespace + 'traceGroup')
 
-    if traceGroupWrapper is not None:
-    	for traceGroup in traceGroupWrapper.findall(doc_namespace + 'traceGroup'):
+    	if traceGroupWrapper is not None:
+    		for traceGroup in traceGroupWrapper.findall(doc_namespace + 'traceGroup'):
 
-    		label = traceGroup.find(doc_namespace + 'annotation').text
+    			label = traceGroup.find(doc_namespace + 'annotation').text
 
-    	    'traces of the current traceGroup'
-    		traces_curr = []
-    		for traceView in traceGroup.findall(doc_namespace + 'traceView'):
+    			'traces of the current traceGroup'
+    			traces_curr = []
+    			for traceView in traceGroup.findall(doc_namespace + 'traceView'):
 
-    			'Id reference to specific trace tag corresponding to currently considered label'
-    			traceDataRef = int(traceView.get('traceDataRef'))
+    				'Id reference to specific trace tag corresponding to currently considered label'
+    				traceDataRef = int(traceView.get('traceDataRef'))
 
-    			'Each trace is represented by a list of coordinates to connect'
-    			single_trace = traces_all[traceDataRef]['coords']
-    			traces_curr.append(single_trace)
+    				'Each trace is represented by a list of coordinates to connect'
+    				single_trace = traces_all[traceDataRef]['coords']
+    				traces_curr.append(single_trace)
 
 
-    		traces_data.append({'label': label, 'trace_group': traces_curr})
+    			traces_data.append({'label': label, 'trace_group': traces_curr})
 
-    else:
-    	'Consider Validation data that has no labels'
-    	[traces_data.append({'trace_group': [trace['coords']]}) for trace in traces_all]
+    	else:
+    		'Consider Validation data that has no labels'
+    		[traces_data.append({'trace_group': [trace['coords']]}) for trace in traces_all]
 
-    return traces_data
+    	return traces_data
 
 def convert_to_imgs(traces_data, box_size=int(100)):
 
