@@ -6,6 +6,9 @@ from tensorflow.python.framework.tensor_conversion_registry import get
 from tensorflow.python.ops.gen_nn_ops import MaxPool
 import os
 import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Reshape
+from tensorflow.math import exp, sqrt, square
 import numpy as np
 import random
 import math
@@ -23,6 +26,7 @@ class Model(tf.keras.Model):
         self.num_classes = 10
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
         self.num_epochs = 10
+        self.hidden_dim = 32
 
         #optimizer
         self.optimization = tf.keras.optimizers.Adam(learning_rate=0.001)
