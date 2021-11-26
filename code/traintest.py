@@ -11,7 +11,8 @@ import math
 from preprocess import load_data
 from model import Model
 
-
+def segmentation(image):
+    pass
 
 def train(model, train_inputs, train_labels):
     '''
@@ -27,10 +28,38 @@ def train(model, train_inputs, train_labels):
     shape (num_labels, num_classes)
     :return: Optionally list of losses per batch to use for visualize_loss
     '''
-    pass
+    #creates a and index range
+    num_examples = np.arange(train_inputs.shape[0])
+    #shuffles the inputs
+    random_index = tf.random.shuffle(num_examples)
+    #gets the random inputs
+    random_inputs = tf.gather(train_inputs, random_index)
+    #gets the random labels
+    random_labels = tf.gather(train_labels, random_index)
+  
+    #loop through data in batches
+    for i in range(0, random_inputs.shape[0], model.batch_size):
+        if(i + model.batch_size > random_inputs.shape[0]):
+            break
+        
+        #maybe change the shape of the inputs depending on what they are
+        batch_input = random_inputs[i : i + model.batch_size, :, :, :]
+        batch_label = random_labels[i : i + model.batch_size]
+
+        #calculated logit and loss
+        with tf.GradientTape() as tape:
+            logits = model.call(batch_input, is_testing = False)
+            loss = model.loss(logits, batch_label)
+            model.loss_list.append(loss)
+
+        #gets the gradient
+        gradients = tape.gradient(loss, model.trainable_variables)
+        #applies the optimizer
+        model.optimization.apply_gradients(zip(gradients, model.trainable_variables))
 
 
-def test(model, test_inputs, test_labels):
+
+def test_characters(model, test_inputs, test_labels):
     """
     Tests the model on the test inputs and labels. You should NOT randomly 
     flip images or do any extra preprocessing.
@@ -42,8 +71,49 @@ def test(model, test_inputs, test_labels):
     :return: test accuracy - this should be the average accuracy across
     all batches
     """
-    pass
+    accuracy = 0
+    num_batches = 0
 
+    #loop through the data in batches
+    for i in range(0, test_inputs.shape[0], model.batch_size):
+        if(i + model.batch_size > test_inputs.shape[0]):
+            break
+        #get the batched inputs and labels
+        #change the shape of the inputs depending on the size of the inputs
+        batch_input = test_inputs[i : i + model.batch_size, :, :,:]
+ 
+        batch_label = test_labels[i : i + model.batch_size]
+
+        #get logits and calculated accuracy
+        logits = model.call(batch_input, is_testing = True)
+        accuracy += model.accuracy(logits, batch_label)
+        num_batches+=1
+
+    return accuracy/num_batches
+
+
+def test_expressions(model, test_inputs, test_labels):
+    accuracy = 0
+    num_batches = 0
+
+    #segement all the images
+
+    #loop through the data in batches
+    for i in range(0, test_inputs.shape[0], model.batch_size):
+        if(i + model.batch_size > test_inputs.shape[0]):
+            break
+        #get the batched inputs and labels
+        batch_input = test_inputs[i : i + model.batch_size, :, :, :]
+ 
+        batch_label = test_labels[i : i + model.batch_size]
+
+        #get logits and calculated accuracy
+        logits = model.call(batch_input, is_testing = True)
+        #create a fucntion that measures accuracy for expressions
+        accuracy += model.accuracy(logits, batch_label)
+        num_batches+=1
+
+    return accuracy/num_batches
 
 def visualize_loss(losses): 
     """
