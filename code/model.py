@@ -1,5 +1,5 @@
-import csv
 from __future__ import absolute_import
+import csv
 from matplotlib import pyplot as plt
 from numpy.lib.function_base import _DIMENSION_NAME, select
 from tensorflow.python.framework.tensor_conversion_registry import get
@@ -7,7 +7,7 @@ from tensorflow.python.ops.gen_nn_ops import MaxPool
 import os
 import tensorflow as tf
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Reshape
+from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D, Dropout
 from tensorflow.math import exp, sqrt, square
 import numpy as np
 import random
@@ -23,13 +23,37 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         self.batch_size = 100
-        self.num_classes = 10
+        self.num_classes = 87
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
         self.num_epochs = 10
         self.hidden_dim = 32
 
         #optimizer
-        self.optimization = tf.keras.optimizers.Adam(learning_rate=0.001)
+        self.optimization = tf.keras.optimizers.Adam(learning_rate=1e-3)
+
+        # Can change no. of filers and blocks
+
+        self.architecture = [
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block1_conv1"),
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block1_conv2"),
+              MaxPool2D(2, name="block1_pool"),
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block2_conv1"),
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block2_conv2"),
+              MaxPool2D(2, name="block2_pool"),
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block3_conv1"),
+              Conv2D(32,5,1,padding="same",
+                   activation="relu", name="block3_conv2"),
+              MaxPool2D(2, name="block3_pool"),
+              Flatten(),
+              Dense(128, activation="relu"),
+              Dropout(0.25),
+              Dense(self.num_classes, activation="softmax")
+       ]
 
 
     def call(self, inputs):
@@ -39,8 +63,10 @@ class Model(tf.keras.Model):
         :param inputs: 
         :return: logits 
         """
-
-        pass
+        for layer in self.architecture:
+            l = layer(l)
+            
+        return l
 
     def loss(self, logits, labels):
         """
@@ -52,7 +78,8 @@ class Model(tf.keras.Model):
         :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
         :return: the loss of the model as a Tensor
         """
-        pass
+        return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False))
+        #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
     def accuracy(self, logits, labels):
         """
@@ -65,15 +92,15 @@ class Model(tf.keras.Model):
         
         :return: the accuracy of the model as a Tensor
         """
-        pass
+        correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+        return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 
 
 
 def main():
-    tsv_file = open('data/groundtruth_train.tsv')
+    tsv_file = open('../data_png/groundtruth_train.tsv')
     read_tsv = csv.reader(tsv_file, delimiter="\t")
-    print(load_categories())
     # for row in read_tsv:
     #     print(row[0])
 
