@@ -50,7 +50,7 @@ class Model(tf.keras.Model):
                    activation="relu", name="block3_conv2"),
               MaxPool2D(2, name="block3_pool"),
               Flatten(),
-              Dense(128, activation="relu"),
+              Dense(self.hidden_dim, activation="relu"),
               Dropout(0.25),
               Dense(self.num_classes, activation="softmax")
        ]
@@ -78,7 +78,7 @@ class Model(tf.keras.Model):
         :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
         :return: the loss of the model as a Tensor
         """
-        
+
         return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False))
         #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
