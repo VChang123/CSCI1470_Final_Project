@@ -23,7 +23,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         self.batch_size = 100
-        self.num_classes = 87
+        self.num_classes = 87 # Counted tokens in categories.txt
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
         self.num_epochs = 10
         self.hidden_dim = 32
@@ -68,7 +68,7 @@ class Model(tf.keras.Model):
             
         return l
 
-    def loss(self, logits, labels):
+    def loss(self, logits, labels): 
         """
         Calculates the model cross-entropy loss after one forward pass.
         Softmax is applied in this function.
@@ -78,6 +78,7 @@ class Model(tf.keras.Model):
         :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
         :return: the loss of the model as a Tensor
         """
+        
         return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False))
         #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
@@ -94,15 +95,3 @@ class Model(tf.keras.Model):
         """
         correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
-
-
-
-
-def main():
-    tsv_file = open('../data_png/groundtruth_train.tsv')
-    read_tsv = csv.reader(tsv_file, delimiter="\t")
-    # for row in read_tsv:
-    #     print(row[0])
-
-if __name__ == '__main__':
-    main()
