@@ -79,7 +79,7 @@ class Model(tf.keras.Model):
         :return: the loss of the model as a Tensor
         """
 
-        return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False))
+        return tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(labels,logits,from_logits=False))
         #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
     def accuracy(self, logits, labels):

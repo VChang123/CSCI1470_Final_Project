@@ -43,7 +43,7 @@ def train(model, train_inputs, train_labels):
             break
         
         #maybe change the shape of the inputs depending on what they are
-        batch_input = random_inputs[i : i + model.batch_size, :, :, :]
+        batch_input = random_inputs[i : i + model.batch_size]
         batch_label = random_labels[i : i + model.batch_size]
 
         #calculated logit and loss
@@ -80,7 +80,7 @@ def test_characters(model, test_inputs, test_labels):
             break
         #get the batched inputs and labels
         #change the shape of the inputs depending on the size of the inputs
-        batch_input = test_inputs[i : i + model.batch_size, :, :,:]
+        batch_input = test_inputs[i : i + model.batch_size]
  
         batch_label = test_labels[i : i + model.batch_size]
 
@@ -93,6 +93,9 @@ def test_characters(model, test_inputs, test_labels):
 
 
 def test_expressions(model, test_inputs, test_labels):
+    """
+    FIX THIS FUNCTION LATER
+    """
     accuracy = 0
     num_batches = 0
 
@@ -182,6 +185,10 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
 
 
 def main():
+    #get and load data
+    #train model
+    #test model on characters
+    #test model from expression
     pass
 
 
