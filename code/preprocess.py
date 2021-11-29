@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 import csv
 import imageio
+from extract import Extractor
 
 def load_categories():
     
@@ -88,8 +89,31 @@ def load_data(resize):
 
     return images
 
+def get_data():
+    extractor = Extractor(32, "2012")
+    train_data, test_data, _ = extractor.pixels()
+
+    train_inputs = []
+    train_labels = []
+
+    test_inputs = []
+    test_labels = []
+
+    for i in train_data:
+        train_inputs.append(i['features'])
+        train_labels.append(i['label'])
+    
+    for i in test_data:
+        test_input = []
+        test_label = []
+        for j in i:
+            test_input.append(j['features'])
+            test_label.append(j['label'])
+        test_inputs.append(test_input)
+        test_labels.append(test_label)
+
+    return train_inputs, train_labels, test_inputs, test_labels
     
 if __name__ == '__main__':
-   output = load_data(resize=(32,32))
-   
+    train_inputs, train_labels, test_inputs, test_labels = get_data()
   
