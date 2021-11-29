@@ -23,7 +23,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         self.batch_size = 100
-        self.num_classes = 87 # Counted tokens in categories.txt
+        self.num_classes = 97 # or 75
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
         self.num_epochs = 10
         self.hidden_dim = 32
@@ -44,15 +44,10 @@ class Model(tf.keras.Model):
               Conv2D(32,5,1,padding="same",
                    activation="relu", name="block2_conv2"),
               MaxPool2D(2, name="block2_pool"),
-              Conv2D(32,5,1,padding="same",
-                   activation="relu", name="block3_conv1"),
-              Conv2D(32,5,1,padding="same",
-                   activation="relu", name="block3_conv2"),
-              MaxPool2D(2, name="block3_pool"),
               Flatten(),
               Dense(self.hidden_dim, activation="relu"),
-              Dropout(0.25),
-              Dense(self.num_classes, activation="softmax")
+              Dropout(0.3),
+              Dense(self.num_classes, activation="softmax") # can change to relu
        ]
 
 
