@@ -52,11 +52,10 @@ class Extractor(object):
                 exit()
 
         self.versions = versions
-        print(self.versions)
 
         # Get names of available categories
         category_names = [category["name"] for category in self.categories_available]
-        print(category_names)
+
         classes = []
         for category in categories:
 
@@ -99,7 +98,7 @@ class Extractor(object):
                 data_dir = os.path.join(self.crohme_package, "CROHME2012_data")
                 train_dir = os.path.join(data_dir, "trainData")
                 test_dir = os.path.join(data_dir, "testDataGT")
-                validation_dir = os.path.join(data_dir, "testData")
+                validation_dir = os.path.join(data_dir, "testDataGT")
 
                 self.train_data += self.parse_inkmls(train_dir, 0)
                 self.test_data += self.parse_inkmls(test_dir, 1)
@@ -138,16 +137,16 @@ class Extractor(object):
 
         'Check object is a directory'
         if os.path.isdir(data_dir_abs_path):
-            # i = 0
+            i = 0
             for inkml_file in os.listdir(data_dir_abs_path):
 
                 if inkml_file.endswith('.inkml'):
                     inkml_file_abs_path = os.path.join(data_dir_abs_path, inkml_file)
 
-                    print('Parsing:', inkml_file_abs_path, '...')
+                    # print('Parsing:', inkml_file_abs_path, '...')
 
-                    ' **** Each entry in traces_data represent SEPARATE pattern\
-                        which might(NOT) have its label encoded along with traces that it\'s made up of **** '
+                    # ' **** Each entry in traces_data represent SEPARATE pattern\
+                    #     which might(NOT) have its label encoded along with traces that it\'s made up of **** '
                     traces_data_curr_inkml = self.get_traces_data(inkml_file_abs_path)
 
                     'Each entry in patterns_enc is a dictionary consisting of \
@@ -158,9 +157,9 @@ class Extractor(object):
                     else:
                         patterns_enc += ptrns_enc_inkml_curr
                     classes_rejected += classes_rej_inkml_curr
-                    # i+=1
-                    # if i == 4:
-                    #     break
+                    i+=1
+                    if i == 4:
+                        break
 
         return patterns_enc
 

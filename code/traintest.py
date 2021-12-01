@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import math
-from preprocess import load_data
+from preprocess import get_data
 from model import Model
 
 def segmentation(image):
@@ -38,24 +38,31 @@ def train(model, train_inputs, train_labels):
     random_labels = tf.gather(train_labels, random_index)
   
     #loop through data in batches
+    accuracy = 0
+    j = 0
     for i in range(0, random_inputs.shape[0], model.batch_size):
         if(i + model.batch_size > random_inputs.shape[0]):
             break
-        
         #maybe change the shape of the inputs depending on what they are
         batch_input = random_inputs[i : i + model.batch_size]
         batch_label = random_labels[i : i + model.batch_size]
+        # print(batch_label)
+        # print(batch_input)
 
         #calculated logit and loss
         with tf.GradientTape() as tape:
-            logits = model.call(batch_input, is_testing = False)
+            logits = model.call(batch_input)
             loss = model.loss(logits, batch_label)
+            accuracy += model.accuracy(logits, batch_label)
             model.loss_list.append(loss)
 
         #gets the gradient
         gradients = tape.gradient(loss, model.trainable_variables)
         #applies the optimizer
         model.optimization.apply_gradients(zip(gradients, model.trainable_variables))
+        j+=1
+
+    return model.loss_list, accuracy/j
 
 
 
@@ -75,8 +82,8 @@ def test_characters(model, test_inputs, test_labels):
     num_batches = 0
 
     #loop through the data in batches
-    for i in range(0, test_inputs.shape[0], model.batch_size):
-        if(i + model.batch_size > test_inputs.shape[0]):
+    for i in range(0, len(test_inputs), model.batch_size):
+        if(i + model.batch_size > len(test_inputs)):
             break
         #get the batched inputs and labels
         #change the shape of the inputs depending on the size of the inputs
@@ -85,7 +92,7 @@ def test_characters(model, test_inputs, test_labels):
         batch_label = test_labels[i : i + model.batch_size]
 
         #get logits and calculated accuracy
-        logits = model.call(batch_input, is_testing = True)
+        logits = model.call(batch_input)
         accuracy += model.accuracy(logits, batch_label)
         num_batches+=1
 
@@ -102,16 +109,16 @@ def test_expressions(model, test_inputs, test_labels):
     #segement all the images
 
     #loop through the data in batches
-    for i in range(0, test_inputs.shape[0], model.batch_size):
-        if(i + model.batch_size > test_inputs.shape[0]):
+    for i in range(0, len(test_inputs), model.batch_size):
+        if(i + model.batch_size > len(test_inputs)):
             break
         #get the batched inputs and labels
-        batch_input = test_inputs[i : i + model.batch_size, :, :, :]
+        batch_input = test_inputs[i : i + model.batch_size]
  
         batch_label = test_labels[i : i + model.batch_size]
 
         #get logits and calculated accuracy
-        logits = model.call(batch_input, is_testing = True)
+        logits = model.call(batch_input)
         #create a fucntion that measures accuracy for expressions
         accuracy += model.accuracy(logits, batch_label)
         num_batches+=1
@@ -186,9 +193,33 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
 
 def main():
     #get and load data
+    train_inputs, train_labels, test_inputs, test_labels, test_char_inputs, test_char_labels = get_data()
+
+    # print(train_inputs.shape)
+    # print(train_labels.shape)
+
+
+    print("Preprocessing Completed!")
+
+    model = Model()
+
     #train model
-    #test model on characters
-    #test model from expression
+    # for i in range(model.num_epochs):
+    loss_list, accuracy = train(model, train_inputs, train_labels)
+        # print("Epoch",i , " ", accuracy)
+    # visualize_loss(loss_list)
+
+    
+    # test model on characters
+
+    acc_1 = test_characters(model, test_char_inputs, test_char_labels)
+     
+    print("Accuracy on testing characters: ", acc_1)
+
+    acc = test_expressions(model, test_inputs, test_labels)
+
+    print("Accuracy on testing", acc)
+    # test model from expression
     pass
 
 
