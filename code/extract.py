@@ -69,7 +69,6 @@ class Extractor(object):
 
                 print("\n! This category does not exist!\n")
                 print("# Possible categories:\n")
-                # [print(" ", category["name"]) for category in self.categories_available]
                 exit()
 
         self.categories = categories
@@ -137,16 +136,11 @@ class Extractor(object):
 
         'Check object is a directory'
         if os.path.isdir(data_dir_abs_path):
-            # i = 0
             for inkml_file in os.listdir(data_dir_abs_path):
 
                 if inkml_file.endswith('.inkml'):
                     inkml_file_abs_path = os.path.join(data_dir_abs_path, inkml_file)
 
-                    # print('Parsing:', inkml_file_abs_path, '...')
-
-                    # ' **** Each entry in traces_data represent SEPARATE pattern\
-                    #     which might(NOT) have its label encoded along with traces that it\'s made up of **** '
                     traces_data_curr_inkml = self.get_traces_data(inkml_file_abs_path)
 
                     'Each entry in patterns_enc is a dictionary consisting of \
@@ -157,9 +151,6 @@ class Extractor(object):
                     else:
                         patterns_enc += ptrns_enc_inkml_curr
                     classes_rejected += classes_rej_inkml_curr
-                    # i+=1
-                    # if i == 25:
-                    #     break
 
         return patterns_enc
 
@@ -200,8 +191,6 @@ class Extractor(object):
 
             'Center scaled pattern so it fits a box with specified size'
             pattern_drawn = self.draw_pattern(centered_trace_grp, box_size=self.box_size)
-            # plt.imshow(pattern_drawn, cmap='gray')
-            # plt.show()
 
             pattern_enc = dict({'features': pattern_drawn, 'label': pattern.get('label')})
 
@@ -347,8 +336,7 @@ class Extractor(object):
                 for pt_idx in range(len(trace) - 1):
 
                     'Indices of pixels that belong to the line. May be used to directly index into an array'
-                    # pattern_drawn[line(r0=trace[pt_idx][1], c0=trace[pt_idx][0],
-                    #                  r1=trace[pt_idx + 1][1], c1=trace[pt_idx + 1][0])] = 0.0
+
                     img = Image.fromarray(pattern_drawn)
                     draw = ImageDraw.Draw(img)
                     draw.line([(trace[pt_idx][0], trace[pt_idx][1]), (trace[pt_idx + 1][0], trace[pt_idx + 1][1])], fill=0, width=3)

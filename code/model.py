@@ -1,27 +1,12 @@
 from __future__ import absolute_import
-import csv
 from matplotlib import pyplot as plt
 from numpy.core.arrayprint import format_float_positional
 from numpy.lib.function_base import _DIMENSION_NAME, select
 from tensorflow.python.framework.tensor_conversion_registry import get
 from tensorflow.python.ops.gen_nn_ops import MaxPool
-import os
 import tensorflow as tf
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D, Dropout, Activation, BatchNormalization
-# from tf.keras.layers.BatchNormalization import BatchNormalization
-from tensorflow.math import exp, sqrt, square
+from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D, Dropout
 import numpy as np
-import random
-import math
-# import tensorflow.keras as keras
-# # from keras.datasets import mnist
-# from keras.layers import Dense, Flatten
-# from keras.layers import Conv2D, MaxPooling2D
-# from keras.models import Sequential
-# from keras.layers.normalization import BatchNormalization
-# from keras.layers import Activation
-# from keras.layers import Dropout
 
 class Model(tf.keras.Model):
     def __init__(self):
@@ -34,15 +19,14 @@ class Model(tf.keras.Model):
 
         self.num_classes = 101
         self.batch_size = 250
-        self.num_epochs = 10
+        self.num_epochs = 5
         self.hidden_dim = 500
 
-        self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
+        # Append losses to this list in training so you can visualize loss vs time in main
+        self.loss_list = [] 
     
         #optimizer
         self.optimization = tf.keras.optimizers.Adam(learning_rate=1e-3)
-
-        # Can change no. of filers and blocks
 
         self.architecture = [
                 Conv2D(32,5,1,padding="same",
@@ -58,7 +42,7 @@ class Model(tf.keras.Model):
                 Flatten(),
                 Dense(self.hidden_dim, activation="relu"),
                 Dropout(0.3),
-                Dense(self.num_classes, activation="softmax") # can change to relu
+                Dense(self.num_classes, activation="softmax")
        ]
 
 

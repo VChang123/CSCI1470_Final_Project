@@ -24,28 +24,20 @@ def train(model, train_inputs, train_labels):
     shape (num_inputs, width, height, num_channels)
     :param train_labels: train labels (all labels to use for training), 
     shape (num_labels, num_classes)
-    :return: Optionally list of losses per batch to use for visualize_loss
+    :return: Optionally list of losses per batch to use for visualize_loss and the trining accuracy
     '''
-    # #creates a and index range
-    # num_examples = np.arange(train_inputs.shape[0])
-    # #shuffles the inputs
-    # random_index = tf.random.shuffle(num_examples)
-    # #gets the random inputs
-    # random_inputs = tf.gather(train_inputs, random_index)
-    # #gets the random labels
-    # random_labels = tf.gather(train_labels, random_index)
-  
+
     #loop through data in batches
     accuracy = 0
     j = 0
     for i in range(0, train_inputs.shape[0], model.batch_size):
+
         if(i + model.batch_size > train_inputs.shape[0]):
             break
+
         #maybe change the shape of the inputs depending on what they are
         batch_input = train_inputs[i : i + model.batch_size]
         batch_label = train_labels[i : i + model.batch_size]
-        # print(batch_label)
-        # print(batch_input)
 
         #calculated logit and loss
         with tf.GradientTape() as tape:
@@ -57,8 +49,10 @@ def train(model, train_inputs, train_labels):
 
         #gets the gradient
         gradients = tape.gradient(loss, model.trainable_variables)
+
         #applies the optimizer
         model.optimization.apply_gradients(zip(gradients, model.trainable_variables))
+
         j+=1
 
     return model.loss_list, accuracy/j
@@ -82,17 +76,18 @@ def test_characters(model, test_inputs, test_labels):
 
     #loop through the data in batches
     for i in range(0, len(test_inputs), model.batch_size):
+
         if(i + model.batch_size > len(test_inputs)):
             break
+
         #get the batched inputs and labels
-        #change the shape of the inputs depending on the size of the inputs
         batch_input = test_inputs[i : i + model.batch_size]
- 
         batch_label = test_labels[i : i + model.batch_size]
 
         #get logits and calculated accuracy
         logits = model.call(batch_input)
         accuracy += model.accuracy(logits, batch_label)
+
         num_batches+=1
 
     return accuracy/num_batches
@@ -104,20 +99,20 @@ def test_expressions(model, test_inputs, test_labels):
     """
     accuracy = 0
 
-    #segement all the images
-
     #loop through the data in batches
 
     for i in range(len(test_inputs)):
-        #get the batched inputs and labels
 
+        # each expression acts as a batch
         expression_input = test_inputs[i]
         expression_input = np.array(expression_input)
+        #reshape each expression for testing
         expression_input = np.reshape(expression_input, (-1,32,32,1))
         expression_label = test_labels[i]
 
         #get logits and calculated accuracy
         logits = model.call(expression_input)
+
         #create a fucntion that measures accuracy for expressions
         accuracy += model.accuracy(logits, expression_label)
 
@@ -156,6 +151,7 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
     """
     # Helper function to plot images into 10 columns
     def plotter(image_indices, label): 
+
         nc = 10
         nr = math.ceil(len(image_indices) / 10)
         fig = plt.figure()
@@ -190,15 +186,9 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
 
 
 def main():
+
     #get and load data
     train_inputs, train_labels, test_inputs, test_labels, test_char_inputs, test_char_labels = get_data()
-
-    
-
-    # print(train_inputs.shape)
-    # print(train_labels.shape)
-
-
     print("Preprocessing Completed!")
 
     model = Model()
@@ -218,10 +208,10 @@ def main():
      
     print("Accuracy for testing characters: ", acc_1)
 
+    # test model from expression
     acc = test_expressions(model, test_inputs, test_labels)
 
     print("Accuracy for testing expression", acc)
-    # test model from expression
     pass
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+
 # Encode to one_hot format
 def encode(class_name, classes):
 
