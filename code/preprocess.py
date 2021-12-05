@@ -143,7 +143,7 @@ def get_data():
     # for i in test_inputs_char[1]:
     #     print(i)
     test_inputs_char = np.expand_dims(test_inputs_char, 0)
-    # test_inputs_char = np.reshape(test_inputs_char, (-1,32,32,1))
+    test_inputs_char = np.reshape(test_inputs_char, (-1,32,32,1))
     # for i in test_inputs_char[1]:
     #     print(i)
     test_labels_char = [encode(test_label_char, extractor.classes) for test_label_char in test_labels_char]

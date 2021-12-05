@@ -204,11 +204,11 @@ def main():
     model = Model()
 
     #train model
-    for i in range(model.num_epochs):
+    for i in range(5):
         loss_list, accuracy = train(model, train_inputs, train_labels)
         print("Epoch",i , " ", accuracy)
         print("Loss:", tf.reduce_mean(model.loss_list))
-    # visualize_loss(loss_list)
+    visualize_loss(loss_list)
 
     print("Accuracy for Training", accuracy)
     

@@ -35,12 +35,12 @@ class Model(tf.keras.Model):
         self.num_classes = 101
         self.batch_size = 250
         self.num_epochs = 10
-        self.hidden_dim = 200
+        self.hidden_dim = 500
 
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
     
         #optimizer
-        self.optimization = tf.keras.optimizers.Adam(learning_rate=0.01)
+        self.optimization = tf.keras.optimizers.Adam(learning_rate=1e-3)
 
         # Can change no. of filers and blocks
 
@@ -88,7 +88,6 @@ class Model(tf.keras.Model):
         """
 
         return tf.reduce_mean(tf.keras.losses.categorical_crossentropy(labels, logits, from_logits=True))
-        #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
     def accuracy(self, logits, labels):
         """
