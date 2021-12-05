@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from matplotlib import pyplot as plt
 from numpy.lib.function_base import _DIMENSION_NAME, select
 from tensorflow.python.framework.tensor_conversion_registry import get
+from tensorflow.python.ops.gen_math_ops import exp
 from tensorflow.python.ops.gen_nn_ops import MaxPool
 import os
 import tensorflow as tf
@@ -10,9 +11,6 @@ import random
 import math
 from preprocess import get_data
 from model import Model
-
-def segmentation(image):
-    pass
 
 def train(model, train_inputs, train_labels):
     '''
@@ -28,24 +26,24 @@ def train(model, train_inputs, train_labels):
     shape (num_labels, num_classes)
     :return: Optionally list of losses per batch to use for visualize_loss
     '''
-    #creates a and index range
-    num_examples = np.arange(train_inputs.shape[0])
-    #shuffles the inputs
-    random_index = tf.random.shuffle(num_examples)
-    #gets the random inputs
-    random_inputs = tf.gather(train_inputs, random_index)
-    #gets the random labels
-    random_labels = tf.gather(train_labels, random_index)
+    # #creates a and index range
+    # num_examples = np.arange(train_inputs.shape[0])
+    # #shuffles the inputs
+    # random_index = tf.random.shuffle(num_examples)
+    # #gets the random inputs
+    # random_inputs = tf.gather(train_inputs, random_index)
+    # #gets the random labels
+    # random_labels = tf.gather(train_labels, random_index)
   
     #loop through data in batches
     accuracy = 0
     j = 0
-    for i in range(0, random_inputs.shape[0], model.batch_size):
-        if(i + model.batch_size > random_inputs.shape[0]):
+    for i in range(0, train_inputs.shape[0], model.batch_size):
+        if(i + model.batch_size > train_inputs.shape[0]):
             break
         #maybe change the shape of the inputs depending on what they are
-        batch_input = random_inputs[i : i + model.batch_size]
-        batch_label = random_labels[i : i + model.batch_size]
+        batch_input = train_inputs[i : i + model.batch_size]
+        batch_label = train_labels[i : i + model.batch_size]
         # print(batch_label)
         # print(batch_input)
 
@@ -53,6 +51,7 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as tape:
             logits = model.call(batch_input)
             loss = model.loss(logits, batch_label)
+            
             accuracy += model.accuracy(logits, batch_label)
             model.loss_list.append(loss)
 
@@ -104,26 +103,25 @@ def test_expressions(model, test_inputs, test_labels):
     FIX THIS FUNCTION LATER
     """
     accuracy = 0
-    num_batches = 0
 
     #segement all the images
 
     #loop through the data in batches
-    for i in range(0, len(test_inputs), model.batch_size):
-        if(i + model.batch_size > len(test_inputs)):
-            break
+
+    for i in range(len(test_inputs)):
         #get the batched inputs and labels
-        batch_input = test_inputs[i : i + model.batch_size]
- 
-        batch_label = test_labels[i : i + model.batch_size]
+
+        expression_input = test_inputs[i]
+        expression_input = np.array(expression_input)
+        expression_input = np.reshape(expression_input, (-1,32,32,1))
+        expression_label = test_labels[i]
 
         #get logits and calculated accuracy
-        logits = model.call(batch_input)
+        logits = model.call(expression_input)
         #create a fucntion that measures accuracy for expressions
-        accuracy += model.accuracy(logits, batch_label)
-        num_batches+=1
+        accuracy += model.accuracy(logits, expression_label)
 
-    return accuracy/num_batches
+    return accuracy/len(test_inputs)
 
 def visualize_loss(losses): 
     """
@@ -195,6 +193,8 @@ def main():
     #get and load data
     train_inputs, train_labels, test_inputs, test_labels, test_char_inputs, test_char_labels = get_data()
 
+    
+
     # print(train_inputs.shape)
     # print(train_labels.shape)
 
@@ -204,21 +204,23 @@ def main():
     model = Model()
 
     #train model
-    # for i in range(model.num_epochs):
-    loss_list, accuracy = train(model, train_inputs, train_labels)
-        # print("Epoch",i , " ", accuracy)
+    for i in range(model.num_epochs):
+        loss_list, accuracy = train(model, train_inputs, train_labels)
+        print("Epoch",i , " ", accuracy)
+        print("Loss:", tf.reduce_mean(model.loss_list))
     # visualize_loss(loss_list)
 
+    print("Accuracy for Training", accuracy)
     
     # test model on characters
 
     acc_1 = test_characters(model, test_char_inputs, test_char_labels)
      
-    print("Accuracy on testing characters: ", acc_1)
+    print("Accuracy for testing characters: ", acc_1)
 
     acc = test_expressions(model, test_inputs, test_labels)
 
-    print("Accuracy on testing", acc)
+    print("Accuracy for testing expression", acc)
     # test model from expression
     pass
 

@@ -137,7 +137,7 @@ class Extractor(object):
 
         'Check object is a directory'
         if os.path.isdir(data_dir_abs_path):
-            i = 0
+            # i = 0
             for inkml_file in os.listdir(data_dir_abs_path):
 
                 if inkml_file.endswith('.inkml'):
@@ -157,9 +157,9 @@ class Extractor(object):
                     else:
                         patterns_enc += ptrns_enc_inkml_curr
                     classes_rejected += classes_rej_inkml_curr
-                    i+=1
-                    if i == 4:
-                        break
+                    # i+=1
+                    # if i == 25:
+                    #     break
 
         return patterns_enc
 
@@ -356,3 +356,4 @@ class Extractor(object):
                     pattern_drawn = np.array(img)
 
         return pattern_drawn
+

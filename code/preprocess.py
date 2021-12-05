@@ -7,6 +7,7 @@ from PIL import Image
 import csv
 import imageio
 from extract import Extractor
+# from extract import save_data
 from one_hot import encode
 
 # def load_categories():
@@ -107,9 +108,15 @@ def get_data():
     for i in train_data:
         train_inputs.append(i['features'])
         train_labels.append(i['label'])
-
+        
     train_inputs = np.array(train_inputs)
-    train_inputs = np.reshape(train_inputs, (-1,32,32,1))
+    # for i in train_inputs[1]:
+    #     print(i)
+    train_inputs = np.reshape(train_inputs, (-1, 1, 32 ,32))
+
+    train_inputs = np.transpose(train_inputs, axes=[0,2,3,1])
+    # for i in train_inputs[1]:
+    #     print(i)
 
     train_labels = [encode(train_label, extractor.classes) for train_label in train_labels]
     train_labels = np.asarray(train_labels)
@@ -133,8 +140,12 @@ def get_data():
         test_labels_char.append(i['label'])
 
     test_inputs_char = np.array(test_inputs_char)
-    test_inputs_char = np.reshape(test_inputs_char, (-1,32,32,1))
-
+    # for i in test_inputs_char[1]:
+    #     print(i)
+    test_inputs_char = np.expand_dims(test_inputs_char, 0)
+    # test_inputs_char = np.reshape(test_inputs_char, (-1,32,32,1))
+    # for i in test_inputs_char[1]:
+    #     print(i)
     test_labels_char = [encode(test_label_char, extractor.classes) for test_label_char in test_labels_char]
     test_labels_char = np.array(test_labels_char)
 

@@ -1,17 +1,27 @@
 from __future__ import absolute_import
 import csv
 from matplotlib import pyplot as plt
+from numpy.core.arrayprint import format_float_positional
 from numpy.lib.function_base import _DIMENSION_NAME, select
 from tensorflow.python.framework.tensor_conversion_registry import get
 from tensorflow.python.ops.gen_nn_ops import MaxPool
 import os
 import tensorflow as tf
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D, Dropout
+from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D, Dropout, Activation, BatchNormalization
+# from tf.keras.layers.BatchNormalization import BatchNormalization
 from tensorflow.math import exp, sqrt, square
 import numpy as np
 import random
 import math
+# import tensorflow.keras as keras
+# # from keras.datasets import mnist
+# from keras.layers import Dense, Flatten
+# from keras.layers import Conv2D, MaxPooling2D
+# from keras.models import Sequential
+# from keras.layers.normalization import BatchNormalization
+# from keras.layers import Activation
+# from keras.layers import Dropout
 
 class Model(tf.keras.Model):
     def __init__(self):
@@ -22,12 +32,13 @@ class Model(tf.keras.Model):
         """
         super(Model, self).__init__()
 
-        self.batch_size = 1
-        self.num_classes = 101 # or 75
-        self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
+        self.num_classes = 101
+        self.batch_size = 250
         self.num_epochs = 10
-        self.hidden_dim = 32
+        self.hidden_dim = 200
 
+        self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
+    
         #optimizer
         self.optimization = tf.keras.optimizers.Adam(learning_rate=0.01)
 
@@ -36,14 +47,14 @@ class Model(tf.keras.Model):
         self.architecture = [
                 Conv2D(32,5,1,padding="same",
                    activation="relu", name="block1_conv1"),
-                # Conv2D(32,5,1,padding="same",
-                #    activation="relu", name="block1_conv2"),
+                Conv2D(32,5,1,padding="same",
+                    activation="relu", name="block1_conv2"),
                 MaxPool2D(2, name="block1_pool"),
-                # Conv2D(64,5,1,padding="same",
-                #    activation="relu", name="block2_conv1"),
-                # Conv2D(64,5,1,padding="same",
-                #    activation="relu", name="block2_conv2"),
-                # MaxPool2D(2, name="block2_pool"),
+                Conv2D(128,5,1,padding="same",
+                   activation="relu", name="block2_conv1"),
+                Conv2D(128,5,1,padding="same",
+                   activation="relu", name="block2_conv2"),
+                MaxPool2D(2, name="block2_pool"),
                 Flatten(),
                 Dense(self.hidden_dim, activation="relu"),
                 Dropout(0.3),
@@ -64,6 +75,7 @@ class Model(tf.keras.Model):
             
         return l
 
+
     def loss(self, logits, labels): 
         """
         Calculates the model cross-entropy loss after one forward pass.
@@ -75,12 +87,7 @@ class Model(tf.keras.Model):
         :return: the loss of the model as a Tensor
         """
 
-        # print(logits.shape)
-        # print(labels.shape)
-        # print(logits)
-        # print(labels)
-
-        return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels,logits))
+        return tf.reduce_mean(tf.keras.losses.categorical_crossentropy(labels, logits, from_logits=True))
         #return tf.keras.losses.sparse_categorical_crossentropy(labels,predictions,from_logits=False)
 
     def accuracy(self, logits, labels):
@@ -94,20 +101,6 @@ class Model(tf.keras.Model):
         
         :return: the accuracy of the model as a Tensor
         """
+
         correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
-        # print(logits)
-        # print(labels)
         return tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
-
-
-    # def accuracy(self,logits, labels):
-    #     """
-    #     Calculates the model's accuracy by comparing the number 
-    #     of correct predictions with the correct answers.
-    #     :param probabilities: result of running model.call() on test inputs
-    #     :param labels: test set labels
-    #     :return: Float (0,1) that contains batch accuracy
-    #     """
-    #     # TODO: calculate the batch accuracy
-    #     result = np.sum(np.argmax(logits, axis=1) == labels)
-    #     return result/labels.shape[0]
