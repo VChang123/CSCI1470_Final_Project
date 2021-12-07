@@ -10,6 +10,6 @@ def encode(class_name, classes):
     return one_hot
 
 # Decode from one_hot format to string
-def decode(one_hot, classes):
-    index = one_hot.argmax()
+def decode(index, classes):
+    
     return classes[index]

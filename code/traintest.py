@@ -11,6 +11,8 @@ import random
 import math
 from preprocess import get_data
 from model import Model
+from one_hot import decode, encode
+from extract import Extractor
 
 def train(model, train_inputs, train_labels):
     '''
@@ -183,6 +185,14 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
     plotter(correct, 'Correct')
     plotter(incorrect, 'Incorrect')
     plt.show()
+
+def decode_expression(probabilities):
+    predicted_labels = np.argmax(probabilities, axis=1)
+    output_symbols = []
+    for i in range(len(predicted_labels)):
+        symbol = decode(predicted_labels[i], Extractor.classes)
+        output_symbols += symbol
+    return output_symbols
 
 
 def main():
