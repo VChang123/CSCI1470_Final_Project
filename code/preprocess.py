@@ -61,8 +61,8 @@ def get_data():
     test_labels_char = [encode(test_label_char, extractor.classes) for test_label_char in test_labels_char]
     test_labels_char = np.array(test_labels_char)
 
-    return train_inputs, train_labels, test_inputs, test_labels, test_inputs_char, test_labels_char
+    return train_inputs, train_labels, test_inputs, test_labels, test_inputs_char, test_labels_char, extractor
     
 if __name__ == '__main__':
-    train_inputs, train_labels, test_inputs, test_labels, test_inputs_char, test_labels_char = get_data()
+    train_inputs, train_labels, test_inputs, test_labels, test_inputs_char, test_labels_char, extractor = get_data()
   

@@ -95,7 +95,7 @@ def test_characters(model, test_inputs, test_labels):
     return accuracy/num_batches
 
 
-def test_expressions(model, test_inputs, test_labels):
+def test_expressions(model, test_inputs, test_labels, extractor1):
     """
     FIX THIS FUNCTION LATER
     """
@@ -116,6 +116,8 @@ def test_expressions(model, test_inputs, test_labels):
         logits = model.call(expression_input)
 
         #create a fucntion that measures accuracy for expressions
+        print("Predicted label: ", decode_expression(logits, extractor1))
+        print("True Label: ", decode_expression(expression_label, extractor1))
         accuracy += model.accuracy(logits, expression_label)
 
     return accuracy/len(test_inputs)
@@ -186,11 +188,11 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
     plotter(incorrect, 'Incorrect')
     plt.show()
 
-def decode_expression(probabilities):
+def decode_expression(probabilities, extractor1):
     predicted_labels = np.argmax(probabilities, axis=1)
     output_symbols = []
     for i in range(len(predicted_labels)):
-        symbol = decode(predicted_labels[i], Extractor.classes)
+        symbol = decode(predicted_labels[i], extractor1.classes)
         output_symbols += symbol
     return output_symbols
 
@@ -198,13 +200,13 @@ def decode_expression(probabilities):
 def main():
 
     #get and load data
-    train_inputs, train_labels, test_inputs, test_labels, test_char_inputs, test_char_labels = get_data()
+    train_inputs, train_labels, test_inputs, test_labels, test_char_inputs, test_char_labels, extractor1 = get_data()
     print("Preprocessing Completed!")
 
     model = Model()
 
     #train model
-    for i in range(5):
+    for i in range(1):
         loss_list, accuracy = train(model, train_inputs, train_labels)
         print("Epoch",i , " ", accuracy)
         print("Loss:", tf.reduce_mean(model.loss_list))
@@ -219,7 +221,7 @@ def main():
     print("Accuracy for testing characters: ", acc_1)
 
     # test model from expression
-    acc = test_expressions(model, test_inputs, test_labels)
+    acc = test_expressions(model, test_inputs, test_labels, extractor1)
 
     print("Accuracy for testing expression", acc)
     pass
