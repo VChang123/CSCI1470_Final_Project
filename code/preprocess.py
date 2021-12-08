@@ -25,7 +25,7 @@ def get_data():
     test_inputs_char = []
     test_labels_char = []
 
-
+    #extracting the training data
     for i in train_data:
         train_inputs.append(i['features'])
         train_labels.append(i['label'])
@@ -36,6 +36,8 @@ def get_data():
 
     train_labels = [encode(train_label, extractor.classes) for train_label in train_labels]
     train_labels = np.asarray(train_labels)
+
+    #extracting the testing data to make the dataset of full mathematical expressions
 
     for i in test_data:
         test_input = []
@@ -51,6 +53,7 @@ def get_data():
         test_inputs.append(test_input)
         test_labels.append(test_label)
 
+    #extracting testing data to make a dataset of individual mathematical symbols
     for i in test_data_char:
         test_inputs_char.append(i['features'])
         test_labels_char.append(i['label'])

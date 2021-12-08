@@ -16,17 +16,12 @@ from extract import Extractor
 
 def train(model, train_inputs, train_labels):
     '''
-    Trains the model on all of the inputs and labels for one epoch. You should shuffle your inputs 
-    and labels - ensure that they are shuffled in the same order using tf.gather or zipping.
-    To increase accuracy, you may want to use tf.image.random_flip_left_right on your
-    inputs before doing the forward pass. You should batch your inputs.
+    Trains the model on all of the inputs and labels for one epoch. 
     
     :param model: the initialized model to use for the forward pass and backward pass
-    :param train_inputs: train inputs (all inputs to use for training), 
-    shape (num_inputs, width, height, num_channels)
-    :param train_labels: train labels (all labels to use for training), 
-    shape (num_labels, num_classes)
-    :return: Optionally list of losses per batch to use for visualize_loss and the trining accuracy
+    :param train_inputs: train inputs (all inputs to use for training) 
+    :param train_labels: train labels (all labels to use for training)
+    :return: loss list and accuracy
     '''
 
     #loop through data in batches
@@ -63,15 +58,11 @@ def train(model, train_inputs, train_labels):
 
 def test_characters(model, test_inputs, test_labels):
     """
-    Tests the model on the test inputs and labels. You should NOT randomly 
-    flip images or do any extra preprocessing.
-    
+    Tests the model on the test inputs and labels.
+
     :param test_inputs: test data (all images to be tested), 
-    shape (num_inputs, width, height, num_channels)
     :param test_labels: test labels (all corresponding labels),
-    shape (num_labels, num_classes)
-    :return: test accuracy - this should be the average accuracy across
-    all batches
+    :return: test accuracy - testing accuracy
     """
     accuracy = 0
     num_batches = 0
@@ -97,7 +88,12 @@ def test_characters(model, test_inputs, test_labels):
 
 def test_expressions(model, test_inputs, test_labels, extractor1):
     """
-    FIX THIS FUNCTION LATER
+    Tests the model on the test inputs and labels fo full mathematical 
+    expressions.
+    
+    :param test_inputs: test data (all images to be tested), 
+    :param test_labels: test labels (all corresponding labels),
+    :return: test accuracy - testing accuracy
     """
     accuracy = 0
 
@@ -139,56 +135,13 @@ def visualize_loss(losses):
     plt.show()  
 
 
-def visualize_results(image_inputs, probabilities, image_labels, first_label, second_label):
-    """
-    Uses Matplotlib to visualize the correct and incorrect results of our model.
-    :param image_inputs: image data from get_data(), limited to 50 images, shape (50, 32, 32, 3)
-    :param probabilities: the output of model.call(), shape (50, num_classes)
-    :param image_labels: the labels from get_data(), shape (50, num_classes)
-    :param first_label: the name of the first class, "cat"
-    :param second_label: the name of the second class, "dog"
-
-
-
-    :return: doesn't return anything, two plots should pop-up, one for correct results,
-    one for incorrect results
-    """
-    # Helper function to plot images into 10 columns
-    def plotter(image_indices, label): 
-
-        nc = 10
-        nr = math.ceil(len(image_indices) / 10)
-        fig = plt.figure()
-        fig.suptitle("{} Examples\nPL = Predicted Label\nAL = Actual Label".format(label))
-        for i in range(len(image_indices)):
-            ind = image_indices[i]
-            ax = fig.add_subplot(nr, nc, i+1)
-            ax.imshow(image_inputs[ind], cmap="Greys")
-            pl = first_label if predicted_labels[ind] == 0.0 else second_label
-            al = first_label if np.argmax(
-                image_labels[ind], axis=0) == 0 else second_label
-            ax.set(title="PL: {}\nAL: {}".format(pl, al))
-            plt.setp(ax.get_xticklabels(), visible=False)
-            plt.setp(ax.get_yticklabels(), visible=False)
-            ax.tick_params(axis='both', which='both', length=0)
-        
-    predicted_labels = np.argmax(probabilities, axis=1)
-    num_images = image_inputs.shape[0]
-
-    # Separate correct and incorrect images
-    correct = []
-    incorrect = []
-    for i in range(num_images): 
-        if predicted_labels[i] == np.argmax(image_labels[i], axis=0): 
-            correct.append(i)
-        else: 
-            incorrect.append(i)
-
-    plotter(correct, 'Correct')
-    plotter(incorrect, 'Incorrect')
-    plt.show()
-
 def decode_expression(probabilities, extractor1):
+    """
+    Decodes the expression from probabilities into actual math symbols
+
+    param probabilities: the probabilities returned by the model
+    param extractor: the extractor that was used to preprocess the data
+    """
     predicted_labels = np.argmax(probabilities, axis=1)
     output_symbols = []
     for i in range(len(predicted_labels)):

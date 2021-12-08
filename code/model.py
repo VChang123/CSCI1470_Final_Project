@@ -11,9 +11,8 @@ import numpy as np
 class Model(tf.keras.Model):
     def __init__(self):
         """
-        This model class will contain the architecture for your CNN that 
-        classifies images. We have left in variables in the constructor
-        for you to fill out, but you are welcome to change them if you'd like.
+        This model class contains the architecture for your CNN that 
+        classifies mathematical symbols. 
         """
         super(Model, self).__init__()
 
@@ -65,9 +64,8 @@ class Model(tf.keras.Model):
         Calculates the model cross-entropy loss after one forward pass.
         Softmax is applied in this function.
         
-        :param logits: during training, a matrix of shape (batch_size, self.num_classes) 
-        containing the result of multiple convolution and feed forward layers
-        :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
+        :param logits: during training, a matrix containing the result of multiple convolution and feed forward layers
+        :param labels: during training, matrix containing the train labels
         :return: the loss of the model as a Tensor
         """
 
